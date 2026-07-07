@@ -17,6 +17,8 @@ def init_session_state() -> None:
     defaults = {
         "refresh_secs": 30,
         "live_mode": False,
+        "nav_bar_open": True,
+        "current_page": "Command Center",
         "hospital_name": "PRĀNA Medical Center",
         "selected_patient": None,
         "selected_report_id": None,

@@ -31,10 +31,8 @@ def kpi_card(value: str, label: str, delta: str = "") -> str:
 
 
 def render_kpi_row(items: List[Tuple[str, str, str]]) -> None:
-    cols = st.columns(len(items))
-    for col, (val, label, delta) in zip(cols, items):
-        with col:
-            st.markdown(kpi_card(val, label, delta), unsafe_allow_html=True)
+    cards = "".join(kpi_card(val, label, delta) for val, label, delta in items)
+    st.markdown(f'<div class="prana-kpi-grid">{cards}</div>', unsafe_allow_html=True)
 
 
 def alert_card(title: str, message: str, severity: str = "CRITICAL") -> None:
@@ -54,28 +52,23 @@ def module_status_card(name: str, status: str) -> str:
 
 
 def render_module_status_grid(statuses: Dict[str, str], cols: int = 5) -> None:
-    names = list(statuses.keys())
-    for i in range(0, len(names), cols):
-        row = names[i : i + cols]
-        columns = st.columns(cols)
-        for j, name in enumerate(row):
-            with columns[j]:
-                st.markdown(module_status_card(name, statuses[name]), unsafe_allow_html=True)
+    cards = "".join(module_status_card(name, statuses[name]) for name in statuses)
+    st.markdown(f'<div class="prana-module-grid">{cards}</div>', unsafe_allow_html=True)
 
 
 def metric_row(label: str, value: str, badge: Optional[str] = None) -> None:
     badge_html = severity_badge(badge) if badge else ""
     st.markdown(
-        f'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;">'
-        f'<span style="color:{COLORS["muted"]}">{label}</span>'
-        f'<span style="font-weight:600;">{value} {badge_html}</span></div>',
+        f'<div class="prana-metric-row">'
+        f'<span class="prana-metric-label">{label}</span>'
+        f'<span class="prana-metric-value">{value} {badge_html}</span></div>',
         unsafe_allow_html=True,
     )
 
 
 def section_header(title: str, subtitle: str = "") -> None:
-    sub = f'<div style="font-size:11px;color:{COLORS["muted"]};margin-bottom:12px;">{subtitle}</div>' if subtitle else ""
-    st.markdown(f'<div style="font-size:16px;font-weight:700;color:{COLORS["text"]};margin:16px 0 4px;">{title}</div>{sub}', unsafe_allow_html=True)
+    sub = f'<div class="prana-section-sub">{subtitle}</div>' if subtitle else ""
+    st.markdown(f'<div class="prana-section-title">{title}</div>{sub}', unsafe_allow_html=True)
 
 
 def camera_placeholder(label: str = "Optical Camera") -> None:

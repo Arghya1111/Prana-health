@@ -65,7 +65,7 @@ from dashboard_data import (
     system_health,
 )
 from dashboard_reports import render_database_panel, render_patient_report_dialog
-from dashboard_sidebar import render_settings_panel, render_sidebar
+from dashboard_sidebar import render_settings_panel, render_sidebar, render_sliding_nav
 from dashboard_theme import COLORS, inject_css, severity_badge, status_dot
 from dashboard_utils import (
     build_analytics_daily,
@@ -102,11 +102,11 @@ def render_top_nav(health: dict) -> None:
     st.markdown(
         f"""
         <div class="prana-topnav">
-          <div>
+          <div class="prana-topnav-brand">
             <div class="prana-logo">PRĀNA</div>
             <div class="prana-tagline">AI Powered Multi-Modal Patient Triage</div>
           </div>
-          <div class="prana-nav-meta">
+          <div class="prana-nav-meta prana-topnav-meta">
             <div style="font-weight:600;color:{COLORS['text']};">{hospital}</div>
             <div>{format_date_now()} · {format_time_now()}</div>
           </div>
@@ -383,14 +383,14 @@ def main() -> None:
         page_title="PRĀNA Clinical Dashboard",
         page_icon="🏥",
         layout="wide",
-        initial_sidebar_state="expanded",
+        initial_sidebar_state="auto",
     )
     ensure_database_ready()
     init_session_state()
     st.markdown(inject_css(), unsafe_allow_html=True)
     _render_deployment_warnings()
 
-    page = render_sidebar()
+    render_sidebar()
     refresh = get_refresh_secs()
 
     # Load data once per interaction; no automatic full-page reruns.
@@ -403,6 +403,7 @@ def main() -> None:
     tick = _live_tick()
 
     render_top_nav(health)
+    page = render_sliding_nav(st.session_state.get("current_page", "Command Center"))
 
     if page == "Command Center":
         page_command_center(fusion, triage, metrics, queue, patient, tick)

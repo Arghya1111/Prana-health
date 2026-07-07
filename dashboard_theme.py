@@ -39,7 +39,8 @@ PLOTLY_LAYOUT: Dict = {
     "paper_bgcolor": "rgba(0,0,0,0)",
     "plot_bgcolor": "rgba(17,24,39,0.6)",
     "font": {"family": "Inter, Segoe UI, system-ui, sans-serif", "color": COLORS["text"], "size": 11},
-    "margin": {"l": 36, "r": 16, "t": 36, "b": 36},
+    "margin": {"l": 36, "r": 12, "t": 32, "b": 28},
+    "autosize": True,
 }
 
 
@@ -85,12 +86,14 @@ def inject_css() -> str:
 
   /* ── Top navigation bar ─────────────────────────────── */
   .prana-topnav {{
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
     background: {c["surface_glass"]}; backdrop-filter: blur(14px);
     border: 1px solid {c["border"]}; border-radius: 16px;
     padding: 14px 24px; margin-bottom: 18px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.35);
   }}
+  .prana-topnav-brand {{ flex: 1 1 180px; min-width: 0; }}
+  .prana-topnav-meta {{ flex: 1 1 200px; min-width: 0; }}
   .prana-logo {{
     font-size: 26px; font-weight: 800; letter-spacing: 4px;
     color: {c["primary"]}; text-shadow: 0 0 24px {c["primary"]}44;
@@ -122,6 +125,120 @@ def inject_css() -> str:
   }}
   .prana-kpi-value {{ font-size: 26px; font-weight: 700; color: {c["text"]}; line-height: 1.1; }}
   .prana-kpi-label {{ font-size: 10px; color: {c["muted"]}; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }}
+
+  /* Responsive KPI + module grids */
+  .prana-kpi-grid {{
+    display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px;
+  }}
+  .prana-module-grid {{
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px;
+  }}
+  .prana-section-title {{
+    font-size: 16px; font-weight: 700; color: {c["text"]}; margin: 16px 0 4px;
+  }}
+  .prana-section-sub {{
+    font-size: 11px; color: {c["muted"]}; margin-bottom: 12px; line-height: 1.4;
+  }}
+  .prana-metric-row {{
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
+    padding: 6px 0; font-size: 12px; border-bottom: 1px solid {c["border"]}33;
+  }}
+  .prana-metric-label {{ color: {c["muted"]}; flex-shrink: 0; }}
+  .prana-metric-value {{ font-weight: 600; text-align: right; word-break: break-word; }}
+
+  /* Sliding nav — target Streamlit block that contains marker */
+  div[data-testid="stVerticalBlock"]:has(.prana-slide-nav-marker) {{
+    border: 1px solid {c["border"]};
+    border-radius: 14px;
+    background: {c["surface_glass"]};
+    backdrop-filter: blur(12px);
+    padding: 10px 12px 12px !important;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }}
+  div[data-testid="stVerticalBlock"]:has(.prana-slide-nav-marker.is-collapsed-block) {{
+    padding-bottom: 10px !important;
+  }}
+  .prana-slide-nav-marker {{ display: none; }}
+  .prana-slide-nav-wrap {{ display: none; }}
+  .prana-slide-nav-hint {{
+    font-size: 11px; color: {c["muted"]}; padding-top: 8px; line-height: 1.4;
+  }}
+  .prana-slide-nav-hint strong {{ color: {c["primary"]}; }}
+  .prana-slide-nav-panel {{
+    overflow: hidden;
+    max-height: 220px;
+    opacity: 1;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  }}
+  div[data-testid="stVerticalBlock"]:has(.prana-slide-nav-marker) .stButton > button {{
+    border-radius: 999px !important;
+    border: 1px solid {c["primary"]}66 !important;
+    background: {c["bg_panel"]} !important;
+    color: {c["primary"]} !important;
+    font-weight: 600 !important;
+    min-height: 40px;
+    transition: all 0.25s ease !important;
+  }}
+  div[data-testid="stVerticalBlock"]:has(.prana-slide-nav-marker) .stButton > button:hover {{
+    background: {c["primary"]}22 !important;
+    border-color: {c["primary"]} !important;
+  }}
+  div[data-testid="stVerticalBlock"]:has(.prana-slide-nav-marker) .stRadio > div {{
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 2px 8px !important;
+    scrollbar-width: thin;
+  }}
+  div[data-testid="stVerticalBlock"]:has(.prana-slide-nav-marker) .stRadio label {{
+    background: {c["bg_panel"]} !important;
+    border: 1px solid {c["border"]} !important;
+    border-radius: 999px !important;
+    padding: 10px 18px !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: {c["text_dim"]} !important;
+    transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    cursor: pointer !important;
+  }}
+  div[data-testid="stVerticalBlock"]:has(.prana-slide-nav-marker) .stRadio label:hover {{
+    border-color: {c["primary"]}88 !important;
+    color: {c["text"]} !important;
+    transform: translateY(-1px);
+  }}
+  div[data-testid="stVerticalBlock"]:has(.prana-slide-nav-marker) .stRadio label:has(input:checked) {{
+    background: linear-gradient(135deg, {c["primary"]}, #2563EB) !important;
+    border-color: {c["primary"]} !important;
+    color: #fff !important;
+    box-shadow: 0 4px 16px {c["primary"]}55 !important;
+    transform: translateY(-1px);
+  }}
+  div[data-testid="stVerticalBlock"]:has(.prana-slide-nav-marker) .stRadio label > div:first-child {{
+    display: none !important;
+  }}
+  div[data-testid="stVerticalBlock"]:has(.prana-slide-nav-marker.is-nav-collapsed) .prana-slide-nav-panel,
+  div[data-testid="stVerticalBlock"]:has(.prana-slide-nav-marker.is-nav-collapsed) [data-testid="stHorizontalBlock"]:has(.stRadio),
+  div[data-testid="stVerticalBlock"]:has(.prana-slide-nav-marker.is-nav-collapsed) .prana-slide-nav-actions-label,
+  div[data-testid="stVerticalBlock"]:has(.prana-slide-nav-marker.is-nav-collapsed) [data-testid="stHorizontalBlock"]:has(.stToggle) {{
+    display: none !important;
+  }}
+  .prana-slide-nav-actions-label {{
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px;
+    color: {c["muted"]}; margin: 4px 0 6px;
+  }}
+  .prana-slide-health {{
+    font-size: 12px; font-weight: 600; color: {c["text"]};
+    padding: 10px 8px; text-align: center;
+    background: {c["bg_panel"]}; border-radius: 10px;
+    border: 1px solid {c["border"]};
+    min-height: 40px; display: flex; align-items: center; justify-content: center;
+  }}
 
   /* ── Severity badges ────────────────────────────────── */
   .prana-badge-critical, .prana-badge-high, .prana-badge-moderate,
@@ -169,5 +286,74 @@ def inject_css() -> str:
     background: {c["surface"]}; border-radius: 8px; color: {c["text_dim"]};
   }}
   hr {{ border-color: {c["border"]} !important; }}
+
+  /* ── Tablet (≤1024px) ───────────────────────────────── */
+  @media (max-width: 1024px) {{
+    .prana-kpi-grid {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
+    .prana-module-grid {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
+    .prana-kpi-value {{ font-size: 22px; }}
+    .block-container {{ padding-left: 1rem !important; padding-right: 1rem !important; }}
+  }}
+
+  /* ── Mobile (≤768px) ────────────────────────────────── */
+  @media (max-width: 768px) {{
+    .prana-slide-nav-panel .stRadio label {{
+      padding: 10px 14px !important; font-size: 12px !important;
+    }}
+    .prana-slide-nav-panel {{ max-height: 260px; }}
+
+    .prana-topnav {{
+      flex-direction: column; align-items: stretch; padding: 12px 14px; border-radius: 12px;
+    }}
+    .prana-topnav-meta {{ text-align: left !important; }}
+    .prana-nav-status {{ justify-content: flex-start; gap: 8px; }}
+    .prana-nav-pill {{ font-size: 10px; padding: 5px 10px; }}
+    .prana-logo {{ font-size: 22px; letter-spacing: 3px; }}
+    .prana-tagline {{ font-size: 10px; }}
+
+    .prana-kpi-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }}
+    .prana-module-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+    .prana-kpi-value {{ font-size: 20px; }}
+    .prana-card {{ padding: 12px 14px; border-radius: 12px; }}
+    .prana-card:hover {{ transform: none; }}
+    .prana-section-title {{ font-size: 15px; margin-top: 12px; }}
+
+    /* Stack Streamlit columns vertically */
+    div[data-testid="stHorizontalBlock"] {{
+      flex-direction: column !important; flex-wrap: wrap !important; gap: 0.75rem !important;
+    }}
+    div[data-testid="column"] {{
+      width: 100% !important; flex: 1 1 100% !important; min-width: 100% !important;
+    }}
+
+    /* Touch-friendly controls */
+    .stButton > button, .stDownloadButton > button {{
+      min-height: 44px; font-size: 14px;
+    }}
+    [data-testid="stSidebar"] .stButton > button {{
+      min-height: 44px;
+    }}
+
+    /* Scrollable tables on small screens */
+    [data-testid="stDataFrame"], .dvn-scroller {{
+      overflow-x: auto !important; -webkit-overflow-scrolling: touch;
+    }}
+
+    /* Charts: fit narrow viewports */
+    [data-testid="stPlotlyChart"], [data-testid="stArrowVegaLiteChart"] {{
+      max-width: 100%; overflow-x: auto;
+    }}
+
+    .block-container {{ padding-top: 0.5rem !important; padding-left: 0.75rem !important; padding-right: 0.75rem !important; }}
+  }}
+
+  /* ── Small phones (≤480px) ──────────────────────────── */
+  @media (max-width: 480px) {{
+    .prana-kpi-grid {{ grid-template-columns: 1fr 1fr; }}
+    .prana-nav-status {{ flex-direction: column; align-items: stretch; }}
+    .prana-nav-pill {{ text-align: center; }}
+    .prana-metric-row {{ flex-direction: column; gap: 2px; }}
+    .prana-metric-value {{ text-align: left; }}
+  }}
 </style>
 """

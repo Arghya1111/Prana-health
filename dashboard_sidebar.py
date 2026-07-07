@@ -10,10 +10,97 @@ import app  # noqa: F401 — project root on sys.path
 
 from app.model_health import missing_models_summary, verify_all_models
 from dashboard_data import check_database, check_fusion_engine, check_nats, system_health
-from dashboard_theme import COLORS, status_dot
+from dashboard_theme import status_dot
+
+PAGES = [
+    "Command Center",
+    "Monitors",
+    "Fusion & Analytics",
+    "Reports & Database",
+    "Settings",
+]
+
+PAGE_SHORT = {
+    "Command Center": "Command",
+    "Monitors": "Monitors",
+    "Fusion & Analytics": "Fusion",
+    "Reports & Database": "Reports",
+    "Settings": "Settings",
+}
+
+
+def render_sliding_nav(current_page: str) -> str:
+    """
+    Horizontal sliding navigation bar with pill buttons.
+    Toggle hides/shows the bar; handle stays visible when collapsed.
+    """
+    nav_open = st.session_state.get("nav_bar_open", True)
+    current = current_page if current_page in PAGES else st.session_state.get("current_page", PAGES[0])
+
+    st.markdown(
+        f'<div class="prana-slide-nav-marker {"is-nav-collapsed" if not nav_open else ""}"></div>',
+        unsafe_allow_html=True,
+    )
+
+    handle_col, hint_col = st.columns([1.2, 5])
+    with handle_col:
+        toggle_label = "▲ Hide menu" if nav_open else "☰ Open menu"
+        if st.button(toggle_label, key="nav_bar_toggle", use_container_width=True):
+            st.session_state["nav_bar_open"] = not nav_open
+            st.rerun()
+    with hint_col:
+        if nav_open:
+            st.markdown(
+                '<div class="prana-slide-nav-hint">Swipe or scroll pages · tap a pill to navigate</div>',
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                f'<div class="prana-slide-nav-hint">Viewing: <strong>{current}</strong> · tap ☰ to change page</div>',
+                unsafe_allow_html=True,
+            )
+
+    page = current
+    if nav_open:
+        st.markdown('<div class="prana-slide-nav-panel">', unsafe_allow_html=True)
+        page = st.radio(
+            "Navigate",
+            PAGES,
+            index=PAGES.index(current),
+            horizontal=True,
+            key="slide_nav_pages",
+            label_visibility="collapsed",
+            format_func=lambda p: PAGE_SHORT.get(p, p),
+        )
+
+        st.markdown('<div class="prana-slide-nav-actions-label">Quick actions</div>', unsafe_allow_html=True)
+        act1, act2, act3 = st.columns(3)
+        with act1:
+            live = st.toggle(
+                "Live waveforms",
+                value=st.session_state.get("live_mode", False),
+                key="slide_nav_live",
+            )
+            st.session_state["live_mode"] = live
+        with act2:
+            if st.button("Refresh data", key="slide_nav_refresh", use_container_width=True):
+                st.cache_data.clear()
+                st.rerun()
+        with act3:
+            health = system_health()
+            st.markdown(
+                f'<div class="prana-slide-health">{status_dot(health.get("status", "degraded"))}'
+                f'System {health.get("score", 0)}%</div>',
+                unsafe_allow_html=True,
+            )
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.session_state["current_page"] = page
+    return page
 
 
 def render_sidebar() -> None:
+    """Sidebar: branding + system status (page nav lives in sliding bar)."""
     st.sidebar.markdown(
         f'<div class="prana-logo" style="font-size:20px;">PRĀNA</div>'
         f'<div class="prana-tagline">Clinical Intelligence</div>',
@@ -21,52 +108,29 @@ def render_sidebar() -> None:
     )
     st.sidebar.divider()
 
-    st.sidebar.markdown("**Navigation**")
-    page = st.sidebar.radio(
-        "Page",
-        [
-            "Command Center",
-            "Monitors",
-            "Fusion & Analytics",
-            "Reports & Database",
-            "Settings",
-        ],
-        label_visibility="collapsed",
-    )
-    st.session_state["current_page"] = page
-
-    st.sidebar.divider()
-    health = system_health()
     st.sidebar.markdown("**System Status**")
+    health = system_health()
     for label, key in [("Database", "database"), ("NATS", "nats"), ("Fusion", "fusion")]:
         ok = health.get(key, False)
         status = "online" if ok else "offline"
         st.sidebar.markdown(f"{status_dot(status)} {label}", unsafe_allow_html=True)
-
     st.sidebar.caption(f"Health: {health['score']}%")
 
     st.sidebar.divider()
-    live = st.sidebar.toggle(
-        "Live waveforms",
-        value=st.session_state.get("live_mode", False),
-        help="Animate monitor waveforms. Dashboard stays still unless you click Refresh.",
-    )
-    st.session_state["live_mode"] = live
+    st.sidebar.caption("Use the **sliding menu bar** above the dashboard to switch pages, refresh, and toggle live waveforms.")
 
-    if st.sidebar.button("Refresh now", use_container_width=True):
-        st.cache_data.clear()
+    if st.sidebar.button("Open navigation menu", use_container_width=True):
+        st.session_state["nav_bar_open"] = True
         st.rerun()
-
-    return page
 
 
 def render_settings_panel() -> None:
-    st.markdown(f"### Settings")
+    st.markdown("### Settings")
     st.session_state["hospital_name"] = st.text_input(
         "Hospital Name", value=st.session_state.get("hospital_name", "PRĀNA Medical Center")
     )
     st.session_state["dark_theme"] = st.toggle("Dark Theme", value=True)
-    st.caption("Use **Refresh now** in the sidebar to reload patient data.")
+    st.caption("Use the sliding menu bar to refresh data or open pages.")
 
     col1, col2 = st.columns(2)
     with col1:

@@ -1,0 +1,17 @@
+[browser]
+gatherUsageStats = false
+
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = false
+# Render injects $PORT at runtime via the start command CLI flags.
+port = 8501
+address = "0.0.0.0"
+
+[theme]
+base = "dark"
+backgroundColor = "#000000"
+secondaryBackgroundColor = "#111111"
+textColor = "#F1F5F9"
+primaryColor = "#38BDF8"

@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: prana-clinical-dashboard
+    runtime: python
+    plan: starter
+    region: oregon
+    buildCommand: >-
+      pip install --upgrade pip &&
+      pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu &&
+      pip install -r requirements.txt
+    startCommand: >-
+      streamlit run dashboard.py
+      --server.port=$PORT
+      --server.address=0.0.0.0
+      --server.headless=true
+      --browser.gatherUsageStats=false
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: PRANA_DATA_DIR
+        value: /var/data
+      - key: STREAMLIT_SERVER_HEADLESS
+        value: "true"
+      - key: STREAMLIT_BROWSER_GATHER_USAGE_STATS
+        value: "false"
+    disk:
+      name: prana-data
+      mountPath: /var/data
+      sizeGB: 1

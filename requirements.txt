@@ -1,0 +1,44 @@
+# ═══════════════════════════════════════════════════════════
+#  PRĀNA — Python dependencies (Render / production)
+#  Install:  pip install -r requirements.txt
+# ═══════════════════════════════════════════════════════════
+
+# ── Core scientific stack ──────────────────────────────────
+numpy>=1.24,<3
+pandas>=2.0,<3
+scipy>=1.11
+matplotlib>=3.7
+
+# ── Machine learning ───────────────────────────────────────
+scikit-learn>=1.3
+joblib>=1.3
+
+# ── ECG / biomedical signal processing ───────────────────────
+neurokit2>=0.2.7
+wfdb>=4.1
+
+# ── Deep learning (install CPU wheels on Render — see render.yaml) ──
+torch>=2.1,<3
+torchvision>=0.16,<1
+torchxrayvision>=1.0
+
+# ── NATS messaging (optional pipeline) ─────────────────────
+nats-py>=2.6
+
+# ── Dashboard (Streamlit + charts) ───────────────────────────
+streamlit>=1.33
+plotly>=5.18
+altair>=5.2
+
+# ── REST API (optional second Render service) ────────────────
+fastapi>=0.110
+uvicorn[standard]>=0.27
+pydantic>=2.5
+
+# ── System monitoring ────────────────────────────────────────
+psutil>=5.9
+
+# ── Image processing (thermal / x-ray modules) ───────────────
+scikit-image>=0.21
+opencv-python-headless>=4.8
+Pillow>=10.0

@@ -62,7 +62,6 @@ def render_sliding_nav(current_page: str) -> str:
 
     page = current
     if nav_open:
-        st.markdown('<div class="prana-slide-nav-panel">', unsafe_allow_html=True)
         page = st.radio(
             "Navigate",
             PAGES,
@@ -93,7 +92,6 @@ def render_sliding_nav(current_page: str) -> str:
                 f'System {health.get("score", 0)}%</div>',
                 unsafe_allow_html=True,
             )
-        st.markdown("</div>", unsafe_allow_html=True)
 
     st.session_state["current_page"] = page
     return page

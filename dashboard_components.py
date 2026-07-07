@@ -22,17 +22,24 @@ def glass_card(title: str, body_html: str = "") -> None:
 
 def kpi_card(value: str, label: str, delta: str = "") -> str:
     delta_html = f'<div class="prana-kpi-label">{delta}</div>' if delta else ""
-    return f"""
-    <div class="prana-card" style="text-align:center;padding:14px 10px;">
-        <div class="prana-kpi-value">{value}</div>
-        <div class="prana-kpi-label">{label}</div>
-        {delta_html}
-    </div>"""
+    return (
+        f'<div class="prana-card" style="text-align:center;padding:14px 10px;">'
+        f'<div class="prana-kpi-value">{value}</div>'
+        f'<div class="prana-kpi-label">{label}</div>{delta_html}</div>'
+    )
+
+
+def _render_html(html: str) -> None:
+    """Render raw HTML (st.html when available, else markdown)."""
+    if hasattr(st, "html"):
+        st.html(html)
+    else:
+        st.markdown(html, unsafe_allow_html=True)
 
 
 def render_kpi_row(items: List[Tuple[str, str, str]]) -> None:
     cards = "".join(kpi_card(val, label, delta) for val, label, delta in items)
-    st.markdown(f'<div class="prana-kpi-grid">{cards}</div>', unsafe_allow_html=True)
+    _render_html(f'<div class="prana-kpi-grid">{cards}</div>')
 
 
 def alert_card(title: str, message: str, severity: str = "CRITICAL") -> None:
@@ -44,16 +51,16 @@ def alert_card(title: str, message: str, severity: str = "CRITICAL") -> None:
 
 def module_status_card(name: str, status: str) -> str:
     label = {"online": "Online", "degraded": "Degraded", "offline": "Offline"}.get(status, status)
-    return f"""
-    <div class="prana-card" style="padding:12px 14px;text-align:center;">
-        <div style="font-size:12px;font-weight:700;color:{COLORS['text']}">{name}</div>
-        <div style="margin-top:6px;font-size:11px;">{status_dot(status)}{label}</div>
-    </div>"""
+    return (
+        f'<div class="prana-card" style="padding:12px 14px;text-align:center;">'
+        f'<div style="font-size:12px;font-weight:700;color:{COLORS["text"]}">{name}</div>'
+        f'<div style="margin-top:6px;font-size:11px;">{status_dot(status)}{label}</div></div>'
+    )
 
 
 def render_module_status_grid(statuses: Dict[str, str], cols: int = 5) -> None:
     cards = "".join(module_status_card(name, statuses[name]) for name in statuses)
-    st.markdown(f'<div class="prana-module-grid">{cards}</div>', unsafe_allow_html=True)
+    _render_html(f'<div class="prana-module-grid">{cards}</div>')
 
 
 def metric_row(label: str, value: str, badge: Optional[str] = None) -> None:

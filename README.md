@@ -7,6 +7,8 @@ Multi-modal clinical intelligence platform combining ECG, EEG, PPG, SpO₂, ther
 ```bash
 python -m venv venv
 source venv/bin/activate   # Windows: venv\Scripts\activate
+pip install -r requirements-torch-cpu.txt   # Linux / WSL
+# Windows local: pip install torch torchvision
 pip install -r requirements.txt
 streamlit run dashboard.py
 ```
@@ -37,10 +39,12 @@ The repository includes a [Render Blueprint](https://render.com/docs/blueprint-s
 
 | Setting | Value |
 |---------|-------|
-| **Runtime** | Python 3.11 |
-| **Build command** | `pip install --upgrade pip && pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu && pip install -r requirements.txt` |
-| **Start command** | `streamlit run dashboard.py --server.port=$PORT --server.address=0.0.0.0` |
+| **Runtime** | Python **3.11.9** (set env `PYTHON_VERSION=3.11.9` — do **not** use 3.14 default) |
+| **Build command** | `bash scripts/render_build.sh` |
+| **Start command** | `streamlit run dashboard.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true` |
 | **Health check path** | `/` |
+
+> **Important:** If the build log shows Python 3.14 or downloads a 500 MB+ CUDA `torch` wheel, your service is misconfigured. Set `PYTHON_VERSION=3.11.9` and use `bash scripts/render_build.sh` as the build command.
 
 ### Environment variables
 

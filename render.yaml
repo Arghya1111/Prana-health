@@ -4,10 +4,7 @@ services:
     runtime: python
     plan: starter
     region: oregon
-    buildCommand: >-
-      pip install --upgrade pip &&
-      pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu &&
-      pip install -r requirements.txt
+    buildCommand: bash scripts/render_build.sh
     startCommand: >-
       streamlit run dashboard.py
       --server.port=$PORT
